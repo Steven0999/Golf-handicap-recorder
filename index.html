@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golf Handicap Calculator — Interactive</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="app">
+      <h1>Golf Handicap Calculator</h1>
+      <p class="sub">Plug in your rounds. It auto-updates your Handicap Index using your example method (lowest 1 differential × <span class="mono" id="bonusLabel">0.96</span>). 🔨🤖🔧</p>
+
+      <div class="grid">
+        <!-- Input panel -->
+        <div class="panel panel-left">
+          <h2>➕ Add / Edit Round</h2>
+          <div class="row">
+            <div>
+              <label for="ags">Adjusted Gross Score (AGS)</label>
+              <input id="ags" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 95" />
+            </div>
+            <div>
+              <label for="cr">Course Rating</label>
+              <input id="cr" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 72.0" />
+            </div>
+            <div>
+              <label for="slope">Slope Rating</label>
+              <input id="slope" type="number" inputmode="decimal" step="1" placeholder="e.g. 120" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="addBtn">Add Round</button>
+            <button id="updateBtn" class="secondary" disabled>Update Selected</button>
+            <button id="clearFormBtn" class="secondary">Clear Form</button>
+          </div>
+
+          <hr class="rule" />
+
+          <h2>⚙️ Calculation Settings</h2>
+          <div class="row">
+            <div>
+              <label for="useCount">Use Lowest N Differentials</label>
+              <input id="useCount" type="number" min="1" step="1" value="1" />
+            </div>
+            <div>
+              <label for="bonus">Bonus (Excellence Factor)</label>
+              <input id="bonus" type="number" step="0.01" value="0.96" />
+            </div>
+            <div>
+              <label for="targetSlope">Target Slope (for Course Handicap)</label>
+              <input id="targetSlope" type="number" step="1" value="120" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="resetSettings" class="secondary">Reset Settings</button>
+          </div>
+
+          <details class="data-mgmt">
+            <summary>Import / Export & Data Management</summary>
+            <div class="row detail-row">
+              <div class="actions">
+                <button id="exportBtn" class="secondary">Export JSON</button>
+                <button id="importBtn" class="secondary">Import JSON</button>
+                <button id="clearAllBtn" class="danger">Clear All Rounds</button>
+              </div>
+              <small class="footnote">Data auto-saves in your browser. Export to back it up.</small>
+            </div>
+          </details>
+        </div>
+
+        <!-- Table panel -->
+        <div class="panel panel-right">
+          <div class="row header-row">
+            <h2>📋 Rounds & Differentials</h2>
+            <span class="pill ghost"><span id="countLabel">0</span> rounds</span>
+          </div>
+          <div class="table-wrap">
+            <table id="roundsTable" aria-describedby="countLabel">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>AGS</th>
+                  <th>CR</th>
+                  <th>Slope</th>
+                  <th>Differential</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="totals">
+            <div class="kpi">
+              <h3>Lowest N Used</h3>
+              <div class="value"><span id="usedN">0</span></div>
+              <small>Highlighted in the table</small>
+            </div>
+            <div class="kpi">
+              <h3>Handicap Index</h3>
+              <div class="value"><span id="handicapIdx">—</span></div>
+              <small>Rounded to 1 decimal</small>
+            </div>
+            <div class="kpi">
+              <h3>Course Handicap</h3>
+              <div class="value"><span id="courseHcp">—</span></div>
+              <small>Target slope × HI ÷ 113 (rounded)</small>
+            </div>
+          </div>
+
+          <p class="footnote">
+            Formula per your example: <code class="inline">Differential = ((AGS − CR) × 113) / Slope</code>, use the lowest N differentials,
+            multiply the average by a bonus factor (default <span class="mono">0.96</span>), then round to 1 decimal. Course Handicap =
+            <code class="inline">HI × (TargetSlope / 113)</code>, rounded to the nearest whole number. ❗
+          </p>
+        </div>
+      </div>
+
+      <div class="panel panel-bottom">
+        <h2>🧪 Quick Fill (Your 3-Round Example)</h2>
+        <div class="row">
+          <button id="loadExample" class="secondary">Load Example Rounds</button>
+          <small class="muted">Adds 95/72.0/120, 88/71.0/113, 102/73.0/130; sets lowest N=1, bonus=0.96, target slope=120.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+  </html>
