@@ -1,0 +1,95 @@
+:root{
+  --bg:#0f1220; --panel:#161a2b; --muted:#8b93a7;
+  --text:#e7ecf6; --accent:#62d4b3; --accent-2:#8aa1ff; --danger:#ff7b7b;
+  --ring: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 70%);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --round: 12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 800px at 85% -10%, #1b2140 0%, transparent 60%) , var(--bg);
+  color:var(--text);
+}
+.container{max-width:1100px; margin:40px auto; padding:0 16px;}
+.app{
+  background:linear-gradient(180deg, #171b2c 0%, #14182a 100%);
+  border:1px solid #242a47; border-radius:16px; padding:20px; box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+}
+h1{margin:0 0 6px 0; font-weight:800; letter-spacing:.2px}
+p.sub{margin:0 0 18px 0; color:var(--muted)}
+.grid{
+  display:grid; gap:16px;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+}
+.panel{
+  background:var(--panel); border:1px solid #2a3159; border-radius:var(--round); padding:16px;
+}
+.panel h2{margin:0 0 12px 0; font-size:1.05rem}
+.panel small{color:var(--muted)}
+.card {border:1px dashed #2a3159; border-radius:var(--round); padding:12px}
+.muted{color:var(--muted)}
+label{display:block; font-size:.85rem; margin-bottom:6px; color:#cfd7f0}
+input[type="number"], input[type="text"], select{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2e355f;
+  background:#0f1330; color:var(--text); outline:none; transition:.15s border, .15s box-shadow;
+  font-size:0.96rem;
+}
+input:focus, select:focus{border-color:var(--accent); box-shadow: var(--ring);}
+button{
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
+  color:#072419; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer;
+  transition: transform .05s ease-in-out, box-shadow .2s; box-shadow: 0 6px 18px rgba(98,212,179,.28);
+}
+button:hover{transform: translateY(-1px)}
+button:active{transform: translateY(0)}
+button.secondary{
+  background: linear-gradient(180deg, #2a3159, #232a52); color:#dfe6ff; box-shadow:none; border:1px solid #3a437b;
+}
+button.danger{
+  background: linear-gradient(180deg, #ff8a8a, #ff7b7b); color:#2a0d0d; box-shadow: 0 6px 18px rgba(255,123,123,.28);
+}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+.row > *{flex:1}
+.rule{border:none; border-top:1px solid #2a3159; margin:16px 0}
+table{
+  width:100%; border-collapse: collapse; overflow:hidden; border-radius:12px; border:1px solid #2a3159;
+  background:#0e1330;
+}
+th, td{padding:10px 12px; text-align:left; border-bottom:1px solid #22274d; font-size:0.95rem}
+th{background:#151a3a; color:#cfd7ff; position:sticky; top:0; z-index:1}
+tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono)}
+.pill{
+  display:inline-block; padding:4px 8px; border-radius:999px; font-size:.78rem; font-weight:700;
+  color:#0a1f18; background:var(--accent); border:1px solid color-mix(in oklab, var(--accent), black 18%);
+}
+.pill.secondary{background: #7f93ff; color:#0a0e1f}
+.pill.ghost{background:transparent; color:#9fb3ff; border:1px dashed #3a437b}
+.selectedRow{background: linear-gradient(90deg, rgba(98,212,179,.18), transparent 60%)}
+.footnote{font-size:.85rem; color:var(--muted)}
+.totals{
+  display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px; margin-top:6px;
+}
+.kpi{
+  background: linear-gradient(180deg, #18233f, #151d35); border:1px solid #2a3159; border-radius:12px; padding:14px;
+}
+.kpi h3{margin:0; font-size:.9rem; color:#cfd7ff}
+.kpi .value{font-weight:900; font-size:1.7rem; margin-top:4px}
+.kpi small{color:var(--muted)}
+.actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+details summary{cursor:pointer; user-select:none; color:#cfd7ff}
+code.inline{background:#0f1330; border:1px solid #2a3159; padding:.2em .5em; border-radius:8px}
+@media (max-width: 900px){
+  .grid{grid-template-columns: 1fr}
+}
+.grid .panel-left{grid-column: span 5;}
+.grid .panel-right{grid-column: span 7;}
+.table-wrap{overflow:auto; max-height:420px}
+.panel-bottom{margin-top:16px}
+.header-row{align-items:center; justify-content:space-between}
+.data-mgmt{margin-top:12px}
+.detail-row{margin-top:10px}
