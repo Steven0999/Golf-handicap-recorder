@@ -20,6 +20,7 @@ body{
 }
 h1{margin:0 0 6px 0; font-weight:800; letter-spacing:.2px}
 p.sub{margin:0 0 18px 0; color:var(--muted)}
+
 .grid{
   display:grid; gap:16px;
   grid-template-columns: repeat(12, 1fr);
@@ -32,7 +33,13 @@ p.sub{margin:0 0 18px 0; color:var(--muted)}
 .panel small{color:var(--muted)}
 .card {border:1px dashed #2a3159; border-radius:var(--round); padding:12px}
 .muted{color:var(--muted)}
-label{display:block; font-size:.85rem; margin-bottom:6px; color:#cfd7f0}
+label{display:block; font-size:.92rem; margin-bottom:6px; color:#cfd7f0}
+.with-info{display:flex; align-items:center; gap:8px}
+.info-btn{
+  display:inline-grid; place-items:center; width:22px; height:22px; padding:0; border-radius:50%;
+  border:1px solid #3a437b; color:#cfe1ff; background:#0f1330; cursor:pointer; font-weight:800; line-height:1;
+}
+.info-btn:hover{box-shadow: var(--ring); border-color:var(--accent)}
 input[type="number"], input[type="text"], select{
   width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2e355f;
   background:#0f1330; color:var(--text); outline:none; transition:.15s border, .15s box-shadow;
@@ -83,6 +90,8 @@ tr:last-child td{border-bottom:none}
 .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
 details summary{cursor:pointer; user-select:none; color:#cfd7ff}
 code.inline{background:#0f1330; border:1px solid #2a3159; padding:.2em .5em; border-radius:8px}
+
+/* Layout tweaks */
 @media (max-width: 900px){
   .grid{grid-template-columns: 1fr}
 }
@@ -93,3 +102,26 @@ code.inline{background:#0f1330; border:1px solid #2a3159; padding:.2em .5em; bor
 .header-row{align-items:center; justify-content:space-between}
 .data-mgmt{margin-top:12px}
 .detail-row{margin-top:10px}
+
+/* Modal */
+.modal[hidden]{display:none}
+.modal{position:fixed; inset:0; z-index:999}
+.modal-backdrop{
+  position:absolute; inset:0; background:rgba(0,0,20,.65); backdrop-filter: blur(2px);
+}
+.modal-card{
+  position:relative; margin:5vh auto; max-width:900px; background:#111633;
+  border:1px solid #2a3159; border-radius:16px; box-shadow: 0 30px 70px rgba(0,0,0,.45);
+  display:flex; flex-direction:column; max-height:90vh;
+}
+.modal-header{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; border-bottom:1px solid #232a52; background:#151b3f;
+}
+.modal-body{padding:16px; overflow:auto; line-height:1.55; color:#e9eeff}
+.modal-body p{margin:0 0 1em 0}
+.modal-footer{padding:12px 16px; border-top:1px solid #232a52; display:flex; justify-content:flex-end}
+.modal-close{
+  background:transparent; border:1px solid #3a437b; color:#cfe1ff; border-radius:8px; padding:6px 10px; cursor:pointer;
+}
+.modal-close:hover{box-shadow: var(--ring); border-color:var(--accent)}
