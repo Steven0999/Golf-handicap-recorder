@@ -1,6 +1,7 @@
 // ===== DOM Helpers & State =====
 const el = id => document.getElementById(id);
 const HISTORY_KEY = 'golf-history-v4'; // version with round picker & modal
+const PLAYERS_KEY = 'golf-players-v1'; // NEW: persist player catalog
 
 // Burger / routing (index -> history navigation handled here)
 const $burger = el('burger');
@@ -25,9 +26,25 @@ $drawerLinks.forEach(btn => btn.addEventListener('click', () => {
   openDrawer(false);
 }));
 
+// ===== Storage (history & players) =====
+function saveHistoryItem(item) {
+  const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  arr.push(item);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+}
+function loadHistory() {
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+}
+function loadPlayers() {
+  return JSON.parse(localStorage.getItem(PLAYERS_KEY) || '[]');
+}
+function savePlayers(list) {
+  localStorage.setItem(PLAYERS_KEY, JSON.stringify(list));
+}
+
 // App data
-let players = [];            // catalog of players
-let roundPlayers = [];       // selected for current round
+let players = loadPlayers();  // catalog of players (persisted)
+let roundPlayers = [];        // selected for current round
 let state = { course:'', area:'', holes:18, scores:{}, par:[] };
 
 // ===== Scorecard elements =====
@@ -39,16 +56,6 @@ const $roundPlayerSelect = el('roundPlayerSelect');
 
 const $generate = el('generate'), $saveHistory = el('saveHistory');
 const $workspace = el('workspace'), $summary = el('summary');
-
-// ===== Storage =====
-function saveHistoryItem(item) {
-  const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-  arr.push(item);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
-}
-function loadHistory() {
-  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-}
 
 // ===== Players (catalog) =====
 function renderPlayerSelectsFromCatalog() {
@@ -92,8 +99,10 @@ function renderPlayerList() {
       row.querySelector('button[data-save]').onclick = () => {
         const newName = (input.value || '').trim();
         if (!newName || newName === oldName) { renderPlayerList(); return; }
-        if (players.includes(newName)) { alert('A player with that name already exists.'); return; }
+        if (players.some(n => n.toLowerCase() === newName.toLowerCase())) { alert('A player with that name already exists.'); return; }
         players[i] = newName;
+        savePlayers(players);
+
         const rpIdx = roundPlayers.indexOf(oldName);
         if (rpIdx !== -1) roundPlayers[rpIdx] = newName;
         if (state.scores[oldName]) { state.scores[newName] = state.scores[oldName]; delete state.scores[oldName]; }
@@ -112,6 +121,8 @@ function renderPlayerList() {
       const name = players[i];
       if (!confirm(`Delete player "${name}" from catalog?`)) return;
       players.splice(i, 1);
+      savePlayers(players);
+
       roundPlayers = roundPlayers.filter(n => n !== name);
       delete state.scores[name];
       renderPlayerSelectsFromCatalog();
@@ -359,7 +370,56 @@ $saveHistory?.addEventListener('click', ()=>{
   },0);
 });
 
-/* INIT */
+/* ====================== Add Player Modal (index page) ===================== */
+const $openAddPlayerModal = document.getElementById('openAddPlayerModal');
+const $addPlayerModal = document.getElementById('addPlayerModal');
+const $modalPlayerForm = document.getElementById('modalPlayerForm');
+const $modalPlayerName = document.getElementById('modalPlayerName');
+const $modalAddAlsoToRound = document.getElementById('modalAddAlsoToRound');
+const $cancelAddPlayer = document.getElementById('cancelAddPlayer');
+
+function showAddPlayerModal() {
+  if (!$addPlayerModal) return;
+  $modalPlayerName.value = '';
+  $modalAddAlsoToRound.checked = false;
+  $addPlayerModal.classList.add('show');
+  $addPlayerModal.setAttribute('aria-hidden', 'false');
+  setTimeout(() => $modalPlayerName.focus(), 0);
+}
+function hideAddPlayerModal() {
+  if (!$addPlayerModal) return;
+  $addPlayerModal.classList.remove('show');
+  $addPlayerModal.setAttribute('aria-hidden', 'true');
+}
+$openAddPlayerModal?.addEventListener('click', showAddPlayerModal);
+$addPlayerModal?.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-backdrop')) hideAddPlayerModal();
+});
+$cancelAddPlayer?.addEventListener('click', hideAddPlayerModal);
+$modalPlayerForm?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = ($modalPlayerName.value || '').trim();
+  if (!name) return;
+  // case-insensitive duplicate check
+  if (players.some(n => n.toLowerCase() === name.toLowerCase())) { alert('This name already exists.'); return; }
+
+  players.push(name);
+  savePlayers(players);
+
+  // Try to add to this round if not at limit
+  const limit = parseInt(($roundCount.value || '8'), 10);
+  if (!roundPlayers.includes(name) && roundPlayers.length < limit) {
+    roundPlayers.push(name);
+  }
+
+  renderPlayerSelectsFromCatalog();
+  hideAddPlayerModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $addPlayerModal?.classList.contains('show')) hideAddPlayerModal();
+});
+
+/* ====================== INIT ===================== */
 window.onload = () => {
   renderPlayerSelectsFromCatalog();
   updateRoundTotalsUI();
