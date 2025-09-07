@@ -3,76 +3,107 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WHS Handicap — History</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Golf History & Handicap</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>WHS Handicap — History & Index</h1>
-    <nav>
-      <a class="btn secondary" href="index.html">➕ Add Round</a>
-    </nav>
+  <!-- Header with burger -->
+  <header class="app-header">
+    <button id="burger" class="burger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <h1 class="app-title">History & Handicap</h1>
   </header>
 
-  <main class="container">
-    <section class="panel">
-      <h2>Your Handicap Index</h2>
-      <div class="row">
+  <!-- Sidebar / Drawer -->
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-header">Menu</div>
+    <button class="drawer-link" data-route="scorecard">Scorecard</button>
+    <button class="drawer-link" data-route="history">History</button>
+    <button class="drawer-link" data-route="profiles">Player Profiles</button>
+    <button class="drawer-link" data-route="leaderboard">Course Leaderboard</button>
+    <button class="drawer-link" data-route="history" data-hash="hi">Handicap (WHS)</button>
+  </nav>
+
+  <main class="wrap">
+    <!-- Handicap index card -->
+    <section class="card" id="hiCard">
+      <h3 id="hiAnchor">Handicap Index (WHS)</h3>
+      <div class="grid cols-5">
         <div class="kpi">
-          <h3>Status</h3>
-          <div class="value" id="statusLabel">—</div>
-          <small class="muted" id="statusNote">Need 54 holes (e.g., three 18H) to show an official index.</small>
+          <h4>Status</h4>
+          <div class="value mono" id="hiStatus">—</div>
+          <small class="muted" id="hiStatusNote">Need 54 holes to establish.</small>
         </div>
         <div class="kpi">
-          <h3>Handicap Index</h3>
-          <div class="value" id="hiValue">—</div>
-          <small class="muted">Rounded to 0.1 per WHS</small>
+          <h4>Handicap Index</h4>
+          <div class="value mono" id="hiValue">—</div>
+          <small class="muted">Rounded to 0.1</small>
         </div>
         <div class="kpi">
-          <h3>Course Handicap</h3>
-          <div class="value" id="chValue">—</div>
-          <small class="muted">Slope × HI / 113</small>
+          <h4>Course Handicap</h4>
+          <div class="value mono" id="chValue">—</div>
+          <small class="muted">= HI × (Slope / 113)</small>
         </div>
         <div class="kpi">
-          <h3>Used Differentials</h3>
-          <div class="value" id="usedN">0</div>
+          <h4>Used Differentials</h4>
+          <div class="value mono" id="usedN">0</div>
           <small class="muted" id="adjNote">Adj: 0.0</small>
         </div>
-      </div>
-
-      <div class="row" style="margin-top:10px">
         <div>
-          <label for="targetSlope">Target Slope (for Course Handicap)</label>
-          <input id="targetSlope" type="number" step="1" value="120" />
+          <label for="targetSlopeHistory">Target Slope</label>
+          <input id="targetSlopeHistory" type="number" step="1" value="120" />
         </div>
       </div>
+      <p class="muted" style="margin-top:8px">
+        WHS selection: use official table for &lt; 20 scores (lowest N with any adjustment), otherwise best 8 of last 20.
+        Differential formula: (113 / Slope) × (AGS − Course Rating − PCC).
+      </p>
     </section>
 
-    <section class="panel">
-      <h2>Rounds (Newest → Oldest)</h2>
-      <div class="table-wrap">
-        <table id="historyTable">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Tee/Notes</th>
-              <th>Holes</th>
-              <th>Total Par</th>
-              <th>Total Score</th>
-              <th>CR</th>
-              <th>Slope</th>
-              <th>PCC</th>
-              <th>Differential</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
+    <!-- PAGE: History -->
+    <section class="card">
+      <h3>History</h3>
+      <div class="grid cols-5">
+        <div>
+          <label>Filter Player</label>
+          <select id="filterHistoryPlayer"><option value="__all__">All</option></select>
+        </div>
+        <div class="muted" style="align-self:end">Saved rounds appear below. Click “Save” on the Scorecard page to add a round.</div>
       </div>
-      <p class="footnote">
-        WHS index calculation: average the lowest <em>N</em> differentials based on how many scores you have (<em>official table</em> for fewer than 20; otherwise best 8 of last 20), then apply the table’s adjustment if any, round to 0.1.  
-        Differential = <code class="inline">(113 / Slope) × (AGS − CR − PCC)</code>.
-      </p>
+      <div id="historyList"></div>
+    </section>
+
+    <!-- PAGE: Player Profiles -->
+    <section class="card">
+      <h3>Player Profiles & History</h3>
+      <div>
+        <label>Select Player</label>
+        <select id="playerProfileSelect"><option value="__none__">Select...</option></select>
+      </div>
+      <div id="playerProfile"></div>
+    </section>
+
+    <!-- PAGE: Course Leaderboard -->
+    <section class="card">
+      <h3>Course Leaderboard</h3>
+      <div style="margin-bottom:10px">
+        <label>Select Course</label>
+        <select id="courseLeaderboardSelect">
+          <option value="__none__">Select a course...</option>
+        </select>
+      </div>
+      <div id="courseParInfo" class="muted" style="margin-bottom:10px"></div>
+      <div style="margin-bottom:10px">
+        <button class="btn" id="btnBest9">Best 9-Hole</button>
+        <button class="btn" id="btnBest18">Best 18-Hole</button>
+      </div>
+      <div class="table-wrap" id="courseLeaderboardTable"></div>
+    </section>
+
+    <section class="card">
+      <h3>Scores Over Time</h3>
+      <canvas id="scoresChart" width="1000" height="380"></canvas>
     </section>
   </main>
 
