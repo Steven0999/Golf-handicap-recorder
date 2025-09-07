@@ -3,161 +3,133 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Golf Handicap Calculator — WHS</title>
+  <title>WHS Handicap — Add Round</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="app">
-      <h1>Golf Handicap Calculator</h1>
-      <p class="sub">
-        Default mode: <strong>WHS (official)</strong> — best 8 of 20, or WHS table when &lt;20 scores. Rounds are saved in your browser.
-      </p>
+  <header class="topbar">
+    <h1>WHS Handicap — Add Round</h1>
+    <nav>
+      <a class="btn secondary" href="history.html">📜 History & Handicap</a>
+    </nav>
+  </header>
 
-      <!-- Mode switch -->
-      <div class="panel panel-bottom" style="margin-top:0">
-        <div class="row" style="align-items:center; gap:16px">
-          <label for="mode" style="flex:0 0 auto">Mode</label>
-          <select id="mode" style="max-width:260px">
-            <option value="whs" selected>WHS (official)</option>
-            <option value="custom">Custom (lowest N × bonus)</option>
+  <main class="container">
+    <section class="panel">
+      <h2>Round Details</h2>
+      <div class="row">
+        <div>
+          <label for="roundDate">Date</label>
+          <input id="roundDate" type="date" />
+        </div>
+        <div>
+          <label for="holesCount">Holes</label>
+          <select id="holesCount">
+            <option value="9">9</option>
+            <option value="18" selected>18</option>
           </select>
-          <small class="muted">WHS ignores the 0.96 multiplier and uses the official selection/adjustment table.</small>
+        </div>
+        <div>
+          <label for="teeName">Tee / Notes (optional)</label>
+          <input id="teeName" type="text" placeholder="e.g., Blue tees, competition" />
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Hole List (Distance • Par • Your Score)</h2>
+      <div class="table-wrap">
+        <table id="holesTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Distance (yd/m)</th>
+              <th>Par</th>
+              <th>Your Score</th>
+            </tr>
+          </thead>
+          <tbody id="holesBody"></tbody>
+          <tfoot>
+            <tr>
+              <td class="mono">Totals</td>
+              <td class="mono">—</td>
+              <td class="mono" id="totalPar">0</td>
+              <td class="mono" id="totalScore">0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="kpi">
+          <h3>Total Par</h3>
+          <div class="value" id="kpiPar">0</div>
+        </div>
+        <div class="kpi">
+          <h3>Total Score (AGS*)</h3>
+          <div class="value" id="kpiScore">0</div>
+          <small class="muted">*Using total score as AGS for now</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Course Data (for Differential)</h2>
+      <p class="muted">
+        If you don’t know these, leave <em>Course Rating = Total Par</em> and <em>Slope = 113</em>.
+        PCC is typically 0.
+      </p>
+      <div class="row">
+        <div>
+          <label for="courseRating">Course Rating</label>
+          <input id="courseRating" type="number" step="0.1" placeholder="defaults to Total Par" />
+        </div>
+        <div>
+          <label for="slopeRating">Slope Rating</label>
+          <input id="slopeRating" type="number" step="1" value="113" />
+        </div>
+        <div>
+          <label for="pcc">PCC</label>
+          <input id="pcc" type="number" step="1" value="0" />
         </div>
       </div>
 
-      <div class="grid">
-        <!-- LEFT: Inputs -->
-        <div class="panel panel-left">
-          <h2>➕ Add / Edit Round</h2>
-          <div class="row">
-            <div>
-              <label for="ags">Adjusted Gross Score (AGS)</label>
-              <input id="ags" type="number" step="0.1" placeholder="e.g. 95" />
-            </div>
-            <div>
-              <label for="cr">Course Rating</label>
-              <input id="cr" type="number" step="0.1" placeholder="e.g. 72.0" />
-            </div>
-            <div>
-              <label for="slope">Slope Rating</label>
-              <input id="slope" type="number" step="1" placeholder="e.g. 120" />
-            </div>
-            <div>
-              <label for="pcc">PCC (−1 to +3, usually 0)</label>
-              <input id="pcc" type="number" step="1" value="0" />
-            </div>
-          </div>
-          <div class="actions">
-            <button id="addBtn">Add Round</button>
-            <button id="updateBtn" class="secondary" disabled>Update Selected</button>
-            <button id="clearFormBtn" class="secondary">Clear Form</button>
-          </div>
-
-          <hr class="rule" />
-
-          <!-- Custom settings (hidden in WHS mode) -->
-          <div id="customSettings" hidden>
-            <h2>⚙️ Custom Settings</h2>
-            <div class="row">
-              <div>
-                <label for="useCount">Use Lowest N Differentials</label>
-                <input id="useCount" type="number" min="1" step="1" value="1" />
-              </div>
-              <div>
-                <label for="bonus">Bonus Multiplier</label>
-                <input id="bonus" type="number" step="0.01" value="0.96" />
-              </div>
-              <div>
-                <label for="targetSlope">Target Slope (for Course Handicap)</label>
-                <input id="targetSlope" type="number" step="1" value="120" />
-              </div>
-            </div>
-            <div class="actions">
-              <button id="resetSettings" class="secondary">Reset Custom</button>
-            </div>
-          </div>
-
-          <!-- WHS settings (simple, just course handicap slope) -->
-          <div id="whsSettings">
-            <h2>⚙️ WHS Settings</h2>
-            <div class="row">
-              <div>
-                <label for="targetSlopeWHS">Target Slope (for Course Handicap)</label>
-                <input id="targetSlopeWHS" type="number" step="1" value="120" />
-              </div>
-            </div>
-          </div>
-
-          <details class="data-mgmt" style="margin-top:12px">
-            <summary>Import / Export & Data Management</summary>
-            <div class="row detail-row">
-              <div class="actions">
-                <button id="exportBtn" class="secondary">Export JSON</button>
-                <button id="importBtn" class="secondary">Import JSON</button>
-                <button id="clearAllBtn" class="danger">Clear All Rounds</button>
-              </div>
-              <small class="footnote">Data auto-saves in your browser. Export to back it up.</small>
-            </div>
-          </details>
-        </div>
-
-        <!-- RIGHT: Table & KPIs -->
-        <div class="panel panel-right">
-          <div class="row header-row">
-            <h2>📋 Rounds & Differentials</h2>
-            <span class="pill ghost"><span id="countLabel">0</span> rounds</span>
-          </div>
-
-          <div class="table-wrap">
-            <table id="roundsTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>AGS</th>
-                  <th>CR</th>
-                  <th>Slope</th>
-                  <th>PCC</th>
-                  <th>Differential</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-            </table>
-          </div>
-
-          <div class="totals">
-            <div class="kpi">
-              <h3>Method</h3>
-              <div class="value"><span id="methodLabel">WHS</span></div>
-              <small id="methodNote">WHS table (best N + adj)</small>
-            </div>
-            <div class="kpi">
-              <h3>Differentials Used</h3>
-              <div class="value"><span id="usedN">0</span></div>
-              <small id="adjNote">Adj: 0.0</small>
-            </div>
-            <div class="kpi">
-              <h3>Handicap Index</h3>
-              <div class="value"><span id="handicapIdx">—</span></div>
-              <small>Rounded to 1 decimal</small>
-            </div>
-            <div class="kpi">
-              <h3>Course Handicap</h3>
-              <div class="value"><span id="courseHcp">—</span></div>
-              <small>Target slope × HI ÷ 113 (rounded)</small>
-            </div>
-          </div>
-
-          <p class="footnote">
-            WHS: average the lowest <em>N</em> Score Differentials (per Rule 5.2a table), apply any listed adjustment, round to 0.1.  
-            Differential = (113 / Slope) × (AGS − CR − PCC). Best 8 of 20 when you have 20 scores. 1
-          </p>
-        </div>
+      <div class="row actions">
+        <button id="saveRound" class="btn">➕ Save Round</button>
+        <button id="clearForm" class="btn secondary">Clear</button>
+        <span class="pill ghost">Preview Differential: <span id="previewDiff">—</span></span>
       </div>
-    </div>
-  </div>
+      <p class="footnote">
+        WHS Score Differential = <code class="inline">(113 / Slope) × (AGS − Course Rating − PCC)</code>.
+        We’re using your total score as AGS until you establish an index; once you have one, you can apply hole-caps (net double bogey) if you want to refine older rounds.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Recent (Unsynced) Entries</h2>
+      <div class="table-wrap">
+        <table id="recentTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Tee/Notes</th>
+              <th>Par</th>
+              <th>Score</th>
+              <th>CR</th>
+              <th>Slope</th>
+              <th>PCC</th>
+              <th>Differential</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+      <p class="muted">All rounds are saved automatically and will appear on the History page.</p>
+    </section>
+  </main>
 
   <script src="app.js"></script>
 </body>
-                           </html>
+  </html>
