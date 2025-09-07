@@ -4,10 +4,29 @@ const HISTORY_KEY = 'golf-history-v4';   // rounds
 const PLAYERS_KEY = 'golf-players-v1';   // players catalog
 
 // Safe JSON helpers
-const safeParse = (str, fallback) => {
-  try { const v = JSON.parse(str); return (v ?? fallback); } catch { return fallback; }
+const safeParseJSON = (str, fallback) => {
+  try { return JSON.parse(str); } catch { return fallback; }
 };
-const isStringArray = v => Array.isArray(v) && v.every(x => typeof x === 'string');
+
+// Safe localStorage access (handles SecurityError / quotas / private mode)
+function getLS(key) {
+  try {
+    const v = localStorage.getItem(key);
+    return v;
+  } catch (err) {
+    console.warn(`[storage] getItem failed for "${key}":`, err);
+    return null;
+  }
+}
+function setLS(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    console.warn(`[storage] setItem failed for "${key}":`, err);
+    return false;
+  }
+}
 
 // ========================= Drawer / Routing (index side) =========================
 const $burger = el('burger');
@@ -30,26 +49,29 @@ $drawerLinks.forEach(btn => btn.addEventListener('click', () => {
   openDrawer(false);
 }));
 
-// ========================= Storage =========================
-function saveHistoryItem(item) {
-  const arr = safeParse(localStorage.getItem(HISTORY_KEY), []);
-  arr.push(item);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
-}
+// ========================= Storage (History & Players) =========================
 function loadHistory() {
-  const arr = safeParse(localStorage.getItem(HISTORY_KEY), []);
+  const raw = getLS(HISTORY_KEY);
+  const arr = safeParseJSON(raw, []);
   return Array.isArray(arr) ? arr : [];
+}
+function saveHistoryItem(item) {
+  const arr = loadHistory();
+  arr.push(item);
+  setLS(HISTORY_KEY, JSON.stringify(arr));
 }
 
 // Players store with schema validation & normalization
 function loadPlayers() {
-  const raw = safeParse(localStorage.getItem(PLAYERS_KEY), []);
-  if (!isStringArray(raw)) return [];
-  // unique (case-insensitive), trimmed
+  const raw = getLS(PLAYERS_KEY);
+  const arr = safeParseJSON(raw, []);
+  if (!Array.isArray(arr)) return [];
+  // normalize + make unique (case-insensitive)
   const seen = new Set();
   const out = [];
-  raw.forEach(n => {
-    const name = String(n).trim();
+  arr.forEach(n => {
+    if (typeof n !== 'string') return;
+    const name = n.trim();
     if (!name) return;
     const key = name.toLowerCase();
     if (!seen.has(key)) { seen.add(key); out.push(name); }
@@ -57,21 +79,23 @@ function loadPlayers() {
   return out;
 }
 function savePlayers(list) {
-  // persist only valid strings, normalized & unique
+  // normalize + unique
   const seen = new Set();
-  const normalized = [];
+  const norm = [];
   list.forEach(n => {
-    const name = String(n).trim();
+    const name = String(n || '').trim();
     if (!name) return;
     const key = name.toLowerCase();
-    if (!seen.has(key)) { seen.add(key); normalized.push(name); }
+    if (!seen.has(key)) { seen.add(key); norm.push(name); }
   });
-  localStorage.setItem(PLAYERS_KEY, JSON.stringify(normalized));
-  return normalized;
+  if (!setLS(PLAYERS_KEY, JSON.stringify(norm))) {
+    console.warn('[players] Falling back to in-memory catalog (storage unavailable).');
+  }
+  return norm;
 }
 
 // ========================= App State =========================
-let players = loadPlayers();          // catalog (persisted)
+let players = loadPlayers();          // catalog (persisted if storage allowed)
 let roundPlayers = [];                // selected for current round
 let state = { course:'', area:'', holes:18, scores:{}, par:[] };
 
@@ -334,6 +358,7 @@ $saveHistory?.addEventListener('click', () => {
   };
   saveHistoryItem(item);
   alert('Round saved to history.');
+
   // Also attach CR/Slope/PCC to newest round if provided on this page
   setTimeout(() => {
     const hist = loadHistory();
@@ -349,7 +374,7 @@ $saveHistory?.addEventListener('click', () => {
       const ags = (sc || []).slice(0, last.holes || 0).reduce((a,b)=>a+(+b||0),0);
       last.differentials[player] = whsDifferential(ags, cr, slope, pccVal);
     });
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+    setLS(HISTORY_KEY, JSON.stringify(hist));
   }, 0);
 });
 
@@ -435,7 +460,7 @@ $modalPlayerForm?.addEventListener('submit', (e) => {
   }
 
   players.push(name);
-  players = savePlayers(players); // normalize & persist
+  players = savePlayers(players); // normalize & persist (if possible)
 
   // Auto-add to round if space and requested
   const limit = parseInt(($roundCount?.value || '8'), 10);
@@ -451,7 +476,7 @@ $modalPlayerForm?.addEventListener('submit', (e) => {
   // Ensure visible as selected in the multi-select
   syncRoundSelectWithRoundPlayers();
 
-  // If user already generated a scorecard, extend state to include new player with zeroes
+  // If a scorecard already exists, add player row with zeroes
   if (Object.keys(state.scores).length && state.holes > 0 && roundPlayers.includes(name)) {
     const len = state.holes;
     state.scores[name] = Array.from({ length: len }, () => 0);
@@ -462,17 +487,17 @@ $modalPlayerForm?.addEventListener('submit', (e) => {
 
 // ========================= INIT =========================
 function init() {
-  // Initial render
   renderPlayerSelectsFromCatalog();
   updateRoundTotalsUI();
 
-  // If players list is empty, provide a gentle hint (optional)
-  // (No UI change; just console feedback)
-  if (!players.length) console.info('Tip: Click "Add New Player" to create your first player.');
+  // Helpful hint in console if storage seems blocked
+  const testOK = setLS('__test__', '1');
+  if (!testOK) console.warn('Note: Local storage appears unavailable. Data will not persist across reloads.');
+  else { setLS('__test__', null); }
 }
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init, { once: true });
 } else {
   init();
-}
+      }
