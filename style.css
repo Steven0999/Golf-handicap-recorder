@@ -1,3 +1,4 @@
+/* ======================== THEME ======================== */
 :root {
   --bg:#0b1320;
   --panel:#121a2b;
@@ -9,137 +10,217 @@
   --card:#0f172a;
   --ring:#3b82f6;
   --border:#23304a;
+
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.5);
+  --shadow-md: 0 10px 30px rgba(0,0,0,.35);
 }
 
-body { margin:0; font-family:system-ui,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif; background:var(--bg); color:var(--text); }
-.app-header { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:10px; background:linear-gradient(180deg,var(--panel),rgba(18,26,43,.9)); border-bottom:1px solid var(--border); padding:10px 12px; }
-.app-title { margin:0; font-size:18px; }
-.wrap { max-width:1200px; margin:0 auto; padding:16px; }
+* { box-sizing: border-box; }
+html, body { height:100%; }
+body {
+  margin:0;
+  font-family: system-ui, Segoe UI, Roboto, Ubuntu, Inter, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-.burger { width:42px; height:36px; display:grid; place-content:center; gap:4px; background:transparent; border:1px solid var(--border); border-radius:8px; cursor:pointer; }
+/* ======================== LAYOUT ======================== */
+.app-header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 10px;
+  background: linear-gradient(180deg, var(--panel), rgba(18,26,43,.9));
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+}
+.app-title { margin: 0; font-size: 18px; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.grid { display: grid; gap: 12px; }
+.grid.cols-5 { grid-template-columns: repeat(5, minmax(0,1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+
+@media (max-width: 1100px){
+  .grid.cols-5 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 780px){
+  .grid.cols-5, .grid.cols-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 520px){
+  .grid.cols-5, .grid.cols-4 { grid-template-columns: 1fr; }
+}
+
+/* ======================== NAV / DRAWER ======================== */
+.burger {
+  width: 42px; height: 36px;
+  display: grid; place-content: center; gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+}
 .burger span { display:block; width:22px; height:2px; background:var(--text); }
 
-.drawer { position:fixed; top:0; left:0; height:100%; width:260px; transform:translateX(-100%); background:var(--panel); border-right:1px solid var(--border); z-index:20; transition:transform .2s ease; display:flex; flex-direction:column; padding:10px; }
-.drawer.open { transform:translateX(0); }
-.drawer-header { font-weight:700; margin:6px 4px 8px; }
-.drawer-link { text-align:left; padding:10px 12px; margin:4px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; font-weight:600; }
+.drawer {
+  position: fixed; top: 0; left: 0; height: 100%; width: 260px;
+  transform: translateX(-100%); transition: transform .2s ease;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  z-index: 20; display: flex; flex-direction: column; padding: 10px;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-header { font-weight: 700; margin: 6px 4px 8px; }
+.drawer-link {
+  text-align: left; padding: 10px 12px; margin: 4px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--text);
+  cursor: pointer; font-weight: 600;
+}
 
-.card { background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:14px; }
-.grid { display:grid; gap:12px; }
-.grid.cols-5 { grid-template-columns:repeat(5,minmax(0,1fr)); }
+/* ======================== FORMS / BUTTONS ======================== */
+label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+input, select, textarea {
+  width: 100%; padding: 8px 10px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--text);
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
 
-label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
-input, select, textarea { width:100%; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); }
+.btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn.primary { background: var(--accent-2); color: #fff; }
+.btn.danger { background: var(--danger); color:#2a0d0d; }
 
-.btn { border:1px solid var(--border); background:var(--card); color:var(--text); padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
-.btn.primary { background:var(--accent-2); color:#fff; }
-.muted { color:var(--muted); }
+.muted { color: var(--muted); }
+.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 
-.history-item { border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:6px; background:rgba(255,255,255,.02); }
-canvas { max-width:100%; background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:12px; }
-
+/* ======================== TABLES / CHARTS ======================== */
+.table-wrap { overflow: auto; }
 .table-wrap table { border-collapse: collapse; width: 100%; }
-.table-wrap th, .table-wrap td { border: 1px solid var(--border); padding: 6px 10px; text-align: center; }
+.table-wrap th, .table-wrap td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: center;
+}
 .table-wrap th.left, .table-wrap td.left { text-align: left; }
+.table-wrap th { background: #10182c; color: #dfe6ff; position: sticky; top: 0; z-index: 1; }
 
-.page[hidden] { display:none !important; }
+canvas { max-width: 100%; background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 12px; }
 
-.player-list { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
-.player-row { display:flex; gap:8px; align-items:center; justify-content:space-between; border:1px solid var(--border); border-radius:10px; padding:8px 10px; background:var(--card); }
-.player-row .name { font-weight:600; }
-.player-row .actions { display:flex; gap:6px; }
-.player-row input[type="text"] { flex:1; min-width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--panel); color:var(--text); }
+/* ======================== PAGE VISIBILITY ======================== */
+.page[hidden] { display: none !important; }
 
-.round-select { width:100%; min-height:170px; }
+/* ======================== PLAYER LIST ======================== */
+.player-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.player-row {
+  display: flex; gap: 8px; align-items: center; justify-content: space-between;
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+  background: var(--card);
+}
+.player-row .name { font-weight: 600; }
+.player-row .actions { display: flex; gap: 6px; }
+.player-row input[type="text"] {
+  flex: 1; min-width: 160px; padding: 8px 10px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--panel); color: var(--text);
+}
+.round-select { width: 100%; min-height: 170px; }
 
-/* ---- Modal ---- */
-.modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100; }
-.modal.show { display:flex; }
-.modal-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.5); }
-.modal-card { position:relative; width:min(520px, 92vw); background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
-.modal-form label { display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
-.modal-form input[type="text"] { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:16px; }
-.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:14px; }
+/* ======================== MODALS ======================== */
+.modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 100; }
+.modal.show { display: flex; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.5); }
+.modal-card {
+  position: relative; width: min(720px, 92vw);
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; box-shadow: var(--shadow-lg);
+}
+.modal-body { max-height: 60vh; overflow: auto; color: var(--text); line-height: 1.5; }
+.modal-form label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 6px; }
+.modal-form input[type="text"] {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 16px;
+}
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
 
-/* ------------------------------------------------------------------ */
-/* === Added styles for Handicap / WHS features (no HTML changes) === */
-/* ------------------------------------------------------------------ */
-
-/* KPI boxes (Totals, Handicap Index, etc.) */
+/* ======================== KPI / WHS ADDITIONS ======================== */
 .kpi {
-  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .kpi h4, .kpi h3 {
-  margin:0;
-  font-size:14px;
-  font-weight:600;
-  color:var(--muted);
+  margin: 0; font-size: 14px; font-weight: 600; color: var(--muted);
 }
-.kpi .value {
-  font-size:22px;
-  font-weight:800;
-  margin-top:4px;
-}
-.kpi small { color:var(--muted); font-size:12px; }
+.kpi .value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+.kpi small { color: var(--muted); font-size: 12px; }
 
-/* Pills (like preview differential or counts) */
+#roundTotalsCard .grid,
+#hiCard .grid {
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+#hiCard { border: 2px solid var(--accent); }
+
+/* Pills (optional badges) */
 .pill {
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
 }
-.pill.ghost {
-  background:transparent;
-  border:1px dashed var(--border);
-  color:var(--muted);
-}
+.pill.ghost { background: transparent; border: 1px dashed var(--border); color: var(--muted); }
 
 /* Info buttons (ⓘ) */
 .info-btn {
-  display:inline-block;
-  width:20px;
-  height:20px;
-  line-height:18px;
-  border-radius:50%;
-  border:1px solid var(--border);
-  background:var(--panel);
-  color:var(--text);
-  font-size:12px;
-  cursor:pointer;
-  text-align:center;
+  display: inline-block; width: 20px; height: 20px; line-height: 18px;
+  border-radius: 50%; border: 1px solid var(--border);
+  background: var(--panel); color: var(--text);
+  font-size: 12px; cursor: pointer; text-align: center;
+  vertical-align: middle; margin-left: 4px;
 }
-.info-btn:hover { background:var(--accent-2); color:#fff; border-color:var(--accent-2); }
+.info-btn:hover { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
 
-/* Handicap History table highlights */
-.table-wrap tr.selectedRow td {
-  background:rgba(76,195,138,0.15);
-}
+/* Selected rows highlight (used when showcasing chosen differentials if needed) */
+.selectedRow td { background: rgba(76,195,138,0.16); }
 
-/* Handicap / round totals summary sections */
-#roundTotalsCard .grid,
-#hiCard .grid {
-  gap:16px;
-  grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+/* ======================== HISTORY LIST ======================== */
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 6px;
+  background: rgba(255,255,255,.02);
 }
 
-/* Handicap Index card in history */
-#hiCard { border:2px solid var(--accent); }
-
-/* Info modal (re-uses .modal base) */
-#infoModal .modal-card {
-  max-width:800px;
-  max-height:80vh;
-  overflow:auto;
-}
-#infoModal .modal-body { font-size:14px; line-height:1.5; color:var(--text); }
+/* ======================== UTILS ======================== */
+.hidden { display:none !important; }
+```0
