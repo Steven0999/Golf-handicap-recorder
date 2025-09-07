@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WHS Handicap — History</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>WHS Handicap — History & Index</h1>
+    <nav>
+      <a class="btn secondary" href="index.html">➕ Add Round</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Your Handicap Index</h2>
+      <div class="row">
+        <div class="kpi">
+          <h3>Status</h3>
+          <div class="value" id="statusLabel">—</div>
+          <small class="muted" id="statusNote">Need 54 holes (e.g., three 18H) to show an official index.</small>
+        </div>
+        <div class="kpi">
+          <h3>Handicap Index</h3>
+          <div class="value" id="hiValue">—</div>
+          <small class="muted">Rounded to 0.1 per WHS</small>
+        </div>
+        <div class="kpi">
+          <h3>Course Handicap</h3>
+          <div class="value" id="chValue">—</div>
+          <small class="muted">Slope × HI / 113</small>
+        </div>
+        <div class="kpi">
+          <h3>Used Differentials</h3>
+          <div class="value" id="usedN">0</div>
+          <small class="muted" id="adjNote">Adj: 0.0</small>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label for="targetSlope">Target Slope (for Course Handicap)</label>
+          <input id="targetSlope" type="number" step="1" value="120" />
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Rounds (Newest → Oldest)</h2>
+      <div class="table-wrap">
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Tee/Notes</th>
+              <th>Holes</th>
+              <th>Total Par</th>
+              <th>Total Score</th>
+              <th>CR</th>
+              <th>Slope</th>
+              <th>PCC</th>
+              <th>Differential</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        WHS index calculation: average the lowest <em>N</em> differentials based on how many scores you have (<em>official table</em> for fewer than 20; otherwise best 8 of last 20), then apply the table’s adjustment if any, round to 0.1.  
+        Differential = <code class="inline">(113 / Slope) × (AGS − CR − PCC)</code>.
+      </p>
+    </section>
+  </main>
+
+  <script src="history.js"></script>
+</body>
+</html>
